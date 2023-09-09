@@ -1,209 +1,253 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
+# .bashrc
+#this one is for DEBIAN ONLY
 
-# If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
-
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
-
-# make less more friendly for non-text input files, see lesspipe(1)
-#[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+    . /etc/bashrc
 fi
 
-# set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
-esac
-
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-force_color_prompt=yes
-
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-        # We have color support; assume it's compliant with Ecma-48
-        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-        # a case would tend to support setf rather than setaf.)
-        color_prompt=yes
-    else
-        color_prompt=
-    fi
+# User specific environment
+if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
+then
+    PATH="$HOME/.local/bin:$HOME/bin:$PATH"
 fi
+export PATH
 
-# The following block is surrounded by two delimiters.
-# These delimiters must not be modified. Thanks.
-# START KALI CONFIG VARIABLES
-PROMPT_ALTERNATIVE=twoline
-NEWLINE_BEFORE_PROMPT=yes
-# STOP KALI CONFIG VARIABLES
+# Uncomment the following line if you don't like systemctl's auto-paging feature:
+# export SYSTEMD_PAGER=
 
-if [ "$color_prompt" = yes ]; then
-    # override default virtualenv indicator in prompt
-    VIRTUAL_ENV_DISABLE_PROMPT=1
+# User specific aliases and functions
 
-    prompt_color='\[\033[;32m\]'
-    info_color='\[\033[1;34m\]'
-    prompt_symbol=㉿
-    if [ "$EUID" -eq 0 ]; then # Change prompt colors for root user
-        prompt_color='\[\033[;94m\]'
-        info_color='\[\033[1;31m\]'
-        # Skull emoji for root terminal
-        #prompt_symbol=💀
-    fi
-    case "$PROMPT_ALTERNATIVE" in
-        twoline)
-            PS1=$prompt_color'┌──${debian_chroot:+($debian_chroot)──}${VIRTUAL_ENV:+(\[\033[0;1m\]$(basename $VIRTUAL_ENV)'$prompt_color')}('$info_color'\u'$prompt_symbol'\h'$prompt_color')-[\[\033[0;1m\]\w'$prompt_color']\n'$prompt_color'└─'$info_color'\$\[\033[0m\] ';;
-        oneline)
-            PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}'$info_color'\u@\h\[\033[00m\]:'$prompt_color'\[\033[01m\]\w\[\033[00m\]\$ ';;
-        backtrack)
-            PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ ';;
-    esac
-    unset prompt_color
-    unset info_color
-    unset prompt_symbol
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-unset color_prompt force_color_prompt
-
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*|Eterm|aterm|kterm|gnome*|alacritty)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
-
-[ "$NEWLINE_BEFORE_PROMPT" = yes ] && PROMPT_COMMAND="PROMPT_COMMAND=echo"
-
-# enable color support of ls, less and man, and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    export LS_COLORS="$LS_COLORS:ow=30;44:" # fix ls color for folders with 777 permissions
-
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-    alias diff='diff --color=auto'
-    alias ip='ip --color=auto'
-
-    export LESS_TERMCAP_mb=$'\E[1;31m'     # begin blink
-    export LESS_TERMCAP_md=$'\E[1;36m'     # begin bold
-    export LESS_TERMCAP_me=$'\E[0m'        # reset bold/blink
-    export LESS_TERMCAP_so=$'\E[01;33m'    # begin reverse video
-    export LESS_TERMCAP_se=$'\E[0m'        # reset reverse video
-    export LESS_TERMCAP_us=$'\E[1;32m'     # begin underline
-    export LESS_TERMCAP_ue=$'\E[0m'        # reset underline
-fi
-
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# some more ls aliases
-alias ll='ls -l'
-alias la='ls -A'
-alias l='ls -CF'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
-
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
-fi
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-#
-#alias google='{read -r arr; browser "https://google.com/search?q=${arr}";} <<<'
+# WINDOWS Compatible
+# allows you to choose from over 125 themes for your terminal
+alias gogh='bash -c  "$(wget -qO- https://git.io/vQgMr)"'
 
 
-alias rc='source ~/.bashrc'
+# WINDOWS Compatible
+#upgrades apt packages
+alias upgrade='sudo apt-get upgrade -y && sudo apt autoremove -y'
 
-alias cl='cd ~ && clear'
+#different package manager
+#alias upgrade='sudo dnf upgrade -y'
 
-alias update='sudo apt update'
+# WINDOWS Compatible
+#install apt package
+alias agi='sudo apt-get install'
 
-alias upgrade='sudo apt upgrade -y'
+#different package manager
+#alias install='sudo dnf install -y'
 
-alias agr='sudo apt remove'
+# WINDOWS Compatible
+# updates apt packages
+alias update='sudo apt-get update'
+#alias update='sudo dnf update'
 
-alias asearch='sudo apt search'
+# WINDOWS Compatible
+# search aptpackages
+alias asearch='sudo apt-cache search'
 
-alias install='sudo apt install'
+#different package manager
+#alias search='sudo dnf search'
+
+# WINDOWS Compatible
+# remove apt packages
+alias agr='sudo apt-get remove'
+
+# WINDOWS Compatible
+# shutdown computer
+alias shutdown='sudo shutdown –h now'
+
+# WINDOWS Compatible
+# reboot computer
+alias reboot='sudo systemctl restart -i'
+
+# lock computer screen
+#alias lock='gnome-screensaver-command --lock'
+
+# opens file explorer
+#alias explore='explorer .'
+
+# WINDOWS Compatible
+# opens a windows explorer window in current directory
+alias explorer='explorer.exe .'
 
 
-# Cute shell shortcuts
-alias ls='ls --sort=extension --color=auto'
-alias ll='ls -lh --color=auto'
-alias lal='ls -alh --color=auto'
-alias la='ls -Al --color=auto'
-alias psg='ps -A | grep'
+# opens file explorer as root
+#alias suexplore='sudo explorer .'
+
+# opens a file - usage = open *link to file*
+#alias open='gnome-open'
+
+# WINDOWS Compatible
+# clones a github repo
+alias clone='git clone'
+
+# displays public ip in terminal
+#alias myip='dig +short myip.opendns.com @resolver1.opendns.com'
+
+# WINDOWS Compatible
+# windows ip
+alias ip='curl -kLs "http://api.ipify.org"'
+
+# WINDOWS Compatible
+# gets ip address and geolocation in one command
+alias ipgeo='$myip | curl ipinfo.io/$myip'
+
+# makes you sudo for terminal session
+alias rooot='sudo -l'
+
+# WINDOWS Compatible
+# removes a file in dir - usage = rm *filename* then type y and enter
+alias rm='rm -i'
+
+# WINDOWS Compatible
+# show some
+alias la='ls -A --color=auto'
+
+# WINDOWS Compatible
+# shows all files, even hidden ones
+alias sall='ls -a --color=auto'
+
+# WINDOWS Compatible
+# installs in main dir
+alias suh='sudo -H'
+
+# WINDOWS Compatible
+# alphabetical sort
+alias labc='ls -lap --color=auto'
+
+
+# completely wipes entire computer
+alias wipewholecomputer='dd if=/dev/urandom of=/dev/hda'
+
+# WINDOWS Compatible
+# downloads site using wget
+alias wgetsite="wget -rmkEpSk -e robots=off --random-wait -U mozilla"
+
+# WINDOWS Compatible
+# copies current directory to clipboard
+alias cpwd='pwd | xclip -selection clipboard'
+
+# WINDOWS Compatible
+# shows available memory on hdd
+alias df='df -h'
+
+# WINDOWS Compatible
+# untar tar.gz file
+alias untar='tar -zxvf'
+
+# WINDOWS Compatible
+# pings server
+alias ping='ping -c 5'
+
+# faster ping
+#alias fastping='ping -c 100 -s.2'
+
+# WINDOWS Compatible
+# displays current date in terminal
+alias date='date +"%m-%d-%Y"'
+
+# WINDOWS Compatible
+# list only directories
+alias lsd='ls -h -b --color=auto -d */'     
+
+# creates and opens a webserver at localhost:9000 in chrome
+#alias www='python -m SimpleHTTPServer 8069 | google-chrome http://localhost:8069'
+
+# WINDOWS Compatible
+# windows version of above script
+#alias wwww='python -m SimpleHTTPServer 8888 | cygstart "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" http://localhost:8888'
+
+# opens synaptic package manager
+#alias synaptic='sudo synaptic'
+
+# sets python3.6 as default python3
+# alias python3="python3.6"
+
+# copy script output to clipboard
+#alias clipboard='xclip -selection clipboard'
+
+#  some more ls aliases below
+# WINDOWS Compatible
+# shows all + hidden files, using a long listing format + classify
+alias ll='ls -alF --color=auto'
+
+# WINDOWS Compatible
+# list files in column and classify
 alias l='ls -CF --color=auto'
 
+# WINDOWS Compatible
+# goes back one directory
+alias ..='cd ..'
 
+#goes back two directories, etc...
+alias ...='cd ../../../'
+alias ....='cd ../../../../'
+alias .....='cd ../../../../'
+alias .4='cd ../../../../'
+alias .5='cd ../../../../..'
 
-alias path='echo -e ${PATH//:/\\n}'
+# WINDOWS Compatible
+#displays the ports on computer
+alias ports='netstat -tulanp'
 
+#alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-# Some more, to avoid mistakes
-alias rm='rm -i'
-alias cp='cp -i'
-alias mv='mv -i'
+# WINDOWS Compatible
+#displays grep commands in color
+alias grep='grep --color=auto --exclude-dir=\.svn'
 
-alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
+# WINDOWS Compatible
+# opens calculator in terminal
+alias calc='bc -l'
 
+# WINDOWS Compatible
+# gets computer cpu info
+alias cpuinfo='lscpu'
 
-alias requirements='pip3 install -r requirements.txt' 
+# WINDOWS Compatible
+# get current directory
+alias dir='echo $PWD'
 
-alias x='exit'
+# alias python3='py -3.7'
+# alias python3='py -3.7.4'
+
+# WINDOWS Compatible
+# restarts bashrc with rc
+alias rc="source ~/.bashrc"
+
+# WINDOWS Compatible
+# Shortcut for apt-cyg install
+# alias aci='apt-cyg install'
+
+# WINDOWS Compatible
+# update apt-cyg
+# alias acu='apt-cyg update'
+
+# WINDOWS Compatible
+# gets size of current dir
+alias dirsz='du -h --max-depth=1'
+
+# WINDOWS Compatible
+#sets permission of directory - need inputs 
+alias cx="chmod +x"
+
+# WINDOWS Compatible
+#gets you a weather display in your terminal
+alias weather='curl wttr.in/'
+
+# WINDOWS Compatible
+#gets just the mp3 audio from a youtube video and saves it
+alias getmp3="youtube-dl -x --audio-format mp3 "
+
+# WINDOWS Compatible
+#mirrors a website for offline archiving a different way than above
+alias mirror='wget -m -r -np -p -k -E'
+
+# WINDOWS Compatible
+#clears everything from terminal
+alias c='clear'
 
 # system
 alias tchau='shutdown -h now'
@@ -211,44 +255,17 @@ alias kname='killall'
 alias kprocess='kill -9'
 alias reboot='systemctl reboot -i'
 
-## a quick way to get out of current directory ##
-alias ..='cd ..'
-alias ...='cd ../../../'
-alias ....='cd ../../../../'
-alias .....='cd ../../../../'
-alias .4='cd ../../../../'
-alias .5='cd ../../../../..'
 
-alias p='ping' 
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
 
-alias ll='ls -lh'
-alias la='ls -lha'
-alias lld='ll | grep "^d"'
-
-
-alias path='echo -e ${PATH//:/\\n}'
-alias now='date +"%T"'
-alias nowtime=now
-alias nowdate='date +"%d-%m-%Y"'
-
-## Get server cpu info ##
-alias cpuinfo='lscpu'
-
-## Ports
-alias ports='sudo lsof -i -P -n | grep LISTEN'
-
-
-alias c='clear'
-
-alias h='history'
-
-alias myip='curl ip.me'
-
+alias requirements='pip3 install -r requirements.txt' 
 
 alias toron='systemctl start tor.service'
 alias toroff='systemctl stop tor.service'
 alias serve='python -m SimpleHTTPServer'
-alias ports='sudo netstat -tulanp'
+alias ports2='sudo netstat -tulanp'
 
 alias cx='chmod +x'
 
@@ -258,26 +275,7 @@ alias weather='curl wttr.in/sarasota'
 
 alias dealwithit="echo '(•_•)' ; echo '( •_•)>⌐■-■' ; echo '(⌐■_■)' ; sleep 1 ; echo '(▀̿Ĺ̯▀̿ ̿)'"
 
-
-#alternate ip
-#curl https://wtfismyip.com/text
-
-
-
-alias j='jobs -l'
-
-alias yd='youtube-dl'
-
-alias explore='explorer.exe .'
-
 alias brb='sudo reboot'
-
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-alias crone='sudo vim /etc/crontab'
-alias totalusage='df -hl --total | grep total'
-alias most='du -hsx * | sort -rh | head -10'
-
-
 
 #repeats last command
 alias r='echo 'repeating'; fc -e -'
@@ -298,12 +296,6 @@ alias please='sudo'
 alias pls='sudo'
 
 
-
-# alias chrome="powershell.exe -Command start chrome"
-# alias firefox="powershell.exe -Command start firefox"
-
-
-# get web server headers #
 alias header='curl -I'
  
 # find out if remote server supports gzip / mod_deflate or not #
@@ -352,32 +344,36 @@ alias lt='ls --human-readable --size -1 -S --classify'
 #sort my modified time
 alias left='ls -t -1'
 
+alias www='python2 -m SimpleHTTPServer'
 
 alias websiteget="wget --random-wait -r -p -e robots=off -U mozilla"
 
 alias genpasswd="strings /dev/urandom | grep -o '[[:alnum:]]' | head -n 30 | tr -d 'n'; echo" 
 
+alias cpwd='pwd | xclip -selection clipboard'
 
-alias www='python2 -m SimpleHTTPServer'
+# WINDOWS Compatible
+# shows available memory on hdd
+alias df='df -h'
 
-alias python='python2'
-alias py2='python2'
+# WINDOWS Compatible
+# untar tar.gz file
+alias untar='tar -zxvf'
 
+# WINDOWS Compatible
+# pings server
+alias ping='ping -c 5'
 
-alias python3='python3'
-alias py3='python3'
+# faster ping
+alias fastping='ping -c 100 -s.2'
 
-eval $(thefuck --alias)
-# You can use whatever you want as an alias, like for Mondays:
-eval $(thefuck --alias FUCK)
+# WINDOWS Compatible
+# displays current date in terminal
+alias date='date +"%m-%d-%Y"'
 
+# creates and opens a webserver at localhost:9000 in chrome
+alias www='python -m SimpleHTTPServer 8069 | google-chrome http://localhost:8069'
 
-# what's using the most memory?
-alias mem='ps -e -orss=,args= | sort -b -k1,1n | pr -TW$COLUMNS'
-
-
-
-alias x='exit'
 
 alias root='sudo -i'
 alias s='sudo "$BASH" -c "$(history -p !!)"'
@@ -387,256 +383,408 @@ alias su='sudo -i'
 alias pip='pip2'
 alias pip3='pip3'
 
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+alias crone='sudo vim /etc/crontab'
+alias totalusage='df -hl --total | grep total'
+alias most='du -hsx * | sort -rh | head -10'
+
+#  some more ls aliases below
+# WINDOWS Compatible
+# shows all + hidden files, using a long listing format + classify
+alias ll='ls -alF --color=auto'
+
+# WINDOWS Compatible
+# list files in column and classify
+alias l='ls -CF --color=auto'
+
+
+
+#alias for youtube-dl all options
+alias youtube-dl='youtube-dl -i --write-sub --write-auto-sub --sub-lang en --embed-subs'
+
+
+#soft-reboot the computer
+alias res='kill -9 -1'
+
+alias freshclam='sudo freshclam'
+
+
+# Alias's for multiple directory listing commands
+# alias la='ls -Alh' # show hidden files
+# alias ls='ls -aFh --color=always' # add colors and file type extensions
+# alias lx='ls -lXBh' # sort by extension
+# alias lk='ls -lSrh' # sort by size
+# alias lc='ls -lcrh' # sort by change time
+# alias lu='ls -lurh' # sort by access time
+# alias lr='ls -lRh' # recursive ls
+# alias lt='ls -ltrh' # sort by date
+# alias lm='ls -alh |more' # pipe through 'more'
+# alias lw='ls -xAh' # wide listing format
+# alias ll='ls -Fls' # long listing format
+# alias labc='ls -lap' #alphabetical sort
+# alias lf="ls -l | egrep -v '^d'" # files only
+# alias ldir="ls -l | egrep '^d'" # directories only
+
+# To see if a command is aliased, a file, or a built-in command
+alias checkcommand="type -t"
+
+# Alias's for safe and forced reboots
+# alias rebootsafe='sudo shutdown -r now'
+# alias rebootforce='sudo shutdown -r -n now'
+
+
+
+# Show all logs in /var/log
+alias logs="sudo find /var/log -type f -exec file {} \; | grep 'text' | cut -d' ' -f1 | sed -e's/:$//g' | grep -v '[0-9]$' | xargs tail -f"
+
+
+# Count all files (recursively) in the current folder
+alias countfiles="for t in files links directories; do echo \`find . -type \${t:0:1} | wc -l\` \$t; done 2> /dev/null"
+
+# Show current network connections to the server
+alias ipview="netstat -anpl | grep :80 | awk {'print \$5'} | cut -d\":\" -f1 | sort | uniq -c | sort -n | sed -e 's/^ *//' -e 's/ *\$//'"
+
+
+# Show all logs in /var/log
+alias logs="sudo find /var/log -type f -exec file {} \; | grep 'text' | cut -d' ' -f1 | sed -e's/:$//g' | grep -v '[0-9]$' | xargs tail -f"
 
 
 
 
 
 
+# random nmap commands
+alias nsub='nmap --script dns-brute --script-args dns-brute.domain=$URL,dns-brute.threads=6 -vv -oN scan'
+alias nall='nmap -F -iL scan --open -oN nall'
+alias nu='nmap -F $URL -v'
+alias sub='subfinder -d $URL -o scan'
+alias n='nmap -F -v'
 
 
 
 
+# History commands
+alias h1="history 10"
+alias h2="history 20"
+alias h3="history 30"
 
+# System state
+#alias reboot="sudo /sbin/reboot"
+#alias poweroff="sudo /sbin/poweroff"
 
+#alias myip='ifconfig en0 | grep inet | grep -v inet6 | cut -d ' ' -f2'
 
+#_______________________________________________________________________________
+#functions
 
+# WINDOWS Compatible
+#clears terminal and returns to ~
+function cdclear { cd ~; clear;}
 
-
-
-
-
-
-
-
-
-
-
-# functions
-# -------------------------------------------------------------------------------------------------------------
-#Make directory & enter it
-mkcd() {
-   mkdir -p $1
-   cd $1
-}
-
-# getlocation() { lynx -dump http://www.ip-adress.com/ip_tracer/?QRY=$1|grep address|egrep 'city|state|country'|awk '{print $3,$4,$5,$6,$7,$8}'|sed 'sip address flag '|sed 'sMy';} 
-
-# stopcoding() {
-#    pkill Trello
-#    pkill Xcode #seems to save changes (I tested it)
-#    pkill Simulator
-#    pkill Discord
-#    pkill SF\ Symbols
-# }
-# freeram() {
-#    pkill Mail
-#    pkill Calendar
-#    pkill Music
-#    pkill Notes
-#    pkill Pages
-#    pkill Messages
-#    pkill -9 Microsoft\ Outlook #complained without the -9
-#    #pkill literally any application... you get the point
-#    #but I don't include Safari/Chrome or apps used constantly
-# }
-
-
-#Search for a specific file 
-#Use: "findfile example"
-#Results: prints any files that begin with "example", is not case-sensitive, picks up any file type (ex. result: ExampleTest.docx)
-findfile() {
-   file = "$@"
-   file += "*"
-   find . -iname $file 2>&1 | grep -v "Operation not permitted"
-}
-#Search for all files with a specific extension
-#Use: "fondest swift"
-#Results: prints all .swift files
-findext() {
-   ext = "*."
-   ext += "$@"
-   find . -iname $ext 2>&1 | grep -v "Operation not permitted"
-}
-
-
-# function google () {
-#     xdg-open  
-# }
-# function II () {
-# sudo apt-get  -y check
-# sudo apt-get  -y clean
-# sudo apt-get  -y  install
-# sudo apt-get  -y  update
-# sudo apt-get  -y  upgrade
-# sudo apt-get  -y  dist-upgrade
-# sudo apt-get  -y check
-# sudo apt-get  -y autoclean
-# sudo apt-get  -y autoremove
-# }
-
-
-
-# function zzz()
-# {
-# while true
-# do
-#     #date
-#     ls -hltr
-#     sleep 1s
-# done
-# }
-
-# function search (){
-#  egrep -roiI $1 . | sort | uniq
-# }
-
-# function whereis (){
-#   find . -name "$1*";
-# }
-
-# Find What is Using a Particular Port
-  # USAGE: $ whoisport 80
-# function whoisport (){
-#         port=$1
-#         pidInfo=$(fuser $port/tcp 2> /dev/null)
-#         pid=$(echo $pidInfo | cut -d':' -f2)
-#         ls -l /proc/$pid/exe
-# }
-
-
-
-
-# Tail Files in Directory
-  # USAGE: $ log {arg1:file filter(opt)} {arg2:string filter(opt)}
-function log (){
- if [ $# -lt 1 ];
- then
-  tail -f *
- fi
-
- if [ $# -gt 1 ];
- then
-  tail -f $1 | grep --line-buffered "$2"
- else
-  tail -f $1
- fi
+# Transform the arguments into a valid url querystring
+urlencode()
+{
+  local args="$@"
+  jq -nr --arg v "$args" '$v|@uri'; 
 }
 
 
 
+# Query duckduckgo
+duckduckgo()
+{
+  lynx "https://lite.duckduckgo.com/lite/?q=$(urlencode "$@")"
+}
+
+find-largest-files() {
+    if [[ $# -ne 1 ]]; then
+        echo "Usage: find-largest-files <directory>"
+    else
+        largest=$(find "$1" -type f -printf '%s\n' | sort -rn | head -1)
+        if (( largest < 1024 )); then
+            unit="B"
+            divisor=1
+        elif (( largest < 1048576 )); then
+            unit="KB"
+            divisor=1024
+        elif (( largest < 1073741824 )); then
+            unit="MB"
+            divisor=1048576
+        else
+            unit="GB"
+            divisor=1073741824
+        fi
+        find "$1" -type f -printf '%s %p\n' | sort -rn | head -20 | awk -v unit="$unit" -v divisor="$divisor" '{ printf "%.2f%s\t%s\n", $1/divisor, unit, $2 }'
+    fi
+}
 
 
+# Searches for text in all files in the current folder
+ftext ()
+{
+	# -i case-insensitive
+	# -I ignore binary files
+	# -H causes filename to be printed
+	# -r recursive search
+	# -n causes line number to be printed
+	# optional: -F treat search term as a literal, not a regular expression
+	# optional: -l only print filenames and not the matching lines ex. grep -irl "$1" *
+	grep -iIHrn --color=always "$1" . | less -r
+}
 
 
-#extracts files per type
+# thefuck - see github
+#eval "$(thefuck --alias fuck)"
+
+# WINDOWS Compatible
+# cli google usage = type google *search term* to google it in default browser
+#working as of 2023 September
+google() {
+    search=""
+    echo "Googling: $@"
+    for term in $@; do
+        search="$search%20$term"
+    done
+    xdg-open "http://www.google.com/search?q=$search"
+}
+
+
 extract () {
   if [ -f $1 ] ; then
-      case $1 in
-          *.tar.bz2)   tar xvjf $1    ;;
-          *.tar.gz)    tar xvzf $1    ;;
-          *.bz2)       bunzip2 $1     ;;
-          *.rar)       rar x $1       ;;
-          *.gz)        gunzip $1      ;;
-          *.tar)       tar xvf $1     ;;
-          *.tbz2)      tar xvjf $1    ;;
-          *.tgz)       tar xvzf $1    ;;
-          *.zip)       unzip $1       ;;
-          *.Z)         uncompress $1  ;;
-          *.7z)        7z x $1        ;;
-          *)           echo "don't know how to extract '$1'..." ;;
-      esac
+    case $1 in
+      *.tar.bz2)  tar xjf $1    ;;
+      *.tar.gz) tar xzf $1    ;;
+      *.bz2)    bunzip2 $1    ;;
+      *.rar)    rar x $1    ;;
+      *.gz)   gunzip $1   ;;
+      *.tar)    tar xf $1   ;;
+      *.tbz2)   tar xjf $1    ;;
+      *.tgz)    tar xzf $1    ;;
+      *.zip)    unzip $1    ;;
+      *.Z)    uncompress $1 ;;
+      *)      echo "'$1' cannot be extracted via extract()" ;;
+    esac
   else
-      echo "'$1' is not a valid file!"
+    echo "'$1' is not a valid file"
   fi
 }
 
+function cheat() {
+      curl cht.sh/$1
+  }
 
+function last {
+    ls -lt $1 | head
+}
 
-# see the top 10 commands run
-history | awk '{cmd[$2]++} END {for(elem in cmd) {print cmd[elem] " " elem}}' | sort -n -r | head -10
-
-
-
-function hg() {
-    history | grep "$1";
+## WIKIPEDIA SEARCH FUNCTION ##
+wikipediaSearch() {
+echo -n -e "\n============================================\n\tWelcome to WikiPedia Search"; echo ""; i=1 ; for line in $(lynx --dump "http://en.wikipedia.org/w/index.php?title=Special%3ASearch&profile=default&search=$1&fulltext=Search" | grep http://en.wikipedia.org/wiki | cut -c7-); do echo $i $line; lines[$i]=$line ;  i=$(($i+1)); done ; echo -n -e "\n============================================\n\tPlease select the link to open - "; read answer; w3m ${lines[$answer]}
 }
 
 
-function weather_report() {
+#eval $(thefuck --alias)
 
-    local response=$(curl --silent 'https://api.openweathermap.org/data/2.5/weather?id=5128581&units=imperial&appid=<YOUR_API_KEY>') 
+if [ -f /etc/bash.command-not-found ]; then
+    . /etc/bash.command-not-found
+fi
 
-    local status=$(echo $response | jq -r '.cod')
-
-    # Check for the 200 response indicating a successful API query.
-    case $status in
-        
-        200) printf "Location: %s %s\n" "$(echo $response | jq '.name') $(echo $response | jq '.sys.country')"  
-             printf "Forecast: %s\n" "$(echo $response | jq '.weather[].description')" 
-             printf "Temperature: %.1f°F\n" "$(echo $response | jq '.main.temp')" 
-             printf "Temp Min: %.1f°F\n" "$(echo $response | jq '.main.temp_min')" 
-             printf "Temp Max: %.1f°F\n" "$(echo $response | jq '.main.temp_max')" 
-            ;;
-        401) echo "401 error"
-            ;;
-        *) echo "error"
-            ;;
-
-    esac
-
-}
-
-
-#cd and ls in one
-cl() {
-    local dir="$1"
-    local dir="${dir:=$HOME}"
-    if [[ -d "$dir" ]]; then
-        cd "$dir" >/dev/null; ls
-    else
-        echo "bash: cl: $dir: Directory not found"
-    fi
+#list servicesd
+listd() {
+	echo -e ${BLD}${RED}" --> SYSTEM LEVEL <--"${NRM}
+	find /etc/systemd/system -mindepth 1 -type d | sed '/getty.target/d' | xargs ls -gG --color
+	[[ $(find $HOME/.config/systemd/user -mindepth 1 -type d | wc -l) -eq 0 ]] ||
+		(echo -e ${BLD}${RED}" --> USER LEVEL <--"${NRM} ; \
+		find $HOME/.config/systemd/user -mindepth 1 -type d | xargs ls -gG --color)
 }
 
 
 
-numfiles() { 
-    N="$(ls $1 | wc -l)"; 
-    echo "$N files in $1";
+#web search tool | Usage: gsearch <value>
+# function gsearch {
+# Q="$@";
+# GOOG_URL='https://www.google.co.uk/search?tbs=li:1&q=';
+# AGENT="Mozilla/4.0";
+# stream=$(curl -A "$AGENT" -skLm 20 "${GOOG_URL}${Q//\ /+}" | grep -oP '\/url\?q=.+?&amp' | sed 's|/url?q=||; s|&amp||');
+# echo -e "${stream//\%/\x}";
+# }
+
+#Is server up ? | Usage: down4me <www.foo.com>
+down4me() {
+curl -s "http://www.downforeveryoneorjustme.com/$1" | sed '/just you/!d;s/<[^>]*>//g';
+}
+
+
+# Run a command x times | Usage: runx <value>
+# http://www.stefanoforenza.com/how-to-repeat-a-shell-command-n-times/
+runx() {
+    n=$1
+    shift
+    while [ $(( n -= 1 )) -ge 0 ]
+    do
+        "$@"
+    done
+}
+
+
+#Search files & directories | Usage: search <file/dirs>
+search() {
+find . -iname "*$@*" | less;
+}
+
+# DuckDuckGo search bash function  | Usage: ddg <foo>
+ddg() {
+    search=""
+    for term in $*; do
+        search="$search%20$term"
+    done
+    xdg-open "http://duckduckgo.com/?q=$search"
+}
+
+# StackOverflow bash search function  | Usage: so <foo>
+so() {
+    search=""
+    for term in $*; do
+        search="$search%20$term"
+    done
+    w3m "http://stackoverflow.com/search?q=$search"
+}
+
+
+#encrypt <file> | Usage encrypt <file>
+function encrypt() {
+        [ -e "$1" ] || return 1
+        openssl des3 -salt -in "$1" -out "$1.$CRYPT_EXT"
+        [ -e "$1.$CRYPT_EXT" ] && shred -u "$1"
+}
+
+#decrypt <file.> | Usage decrypt <file.>
+function decrypt() {
+        [ -e "$1" ] || return 1
+        [ "${1%.$CRYPT_EXT}" != "$1" ] || return 2
+        openssl des3 -d -salt -in $1 -out ${1%.$CRYPT_EXT}
+        [ -e "${1%.$CRYPT_EXT}" ] && rm -f "$1"
+}
+
+
+# kill process at port
+# Usage:
+# `portkill 3000`
+# `portkill 8301 8302` (multiple arguments supported)
+portkill() {
+    for port in "$@"; do
+        pids=$(lsof -ti tcp:"$port")
+        if [ -n "$pids" ]; then
+            echo "Killing process using port $port"
+            echo "$pids" | xargs kill
+        else
+            echo "No processes found using port $port."
+        fi
+    done
+}
+
+
+b64d() {
+	echo -n $1 | base64 -d
+}
+
+b64() {
+	echo -n $1 | base64
+}
+
+
+# Copy file with a progress bar
+cpp()
+{
+	set -e
+	strace -q -ewrite cp -- "${1}" "${2}" 2>&1 \
+	| awk '{
+	count += $NF
+	if (count % 10 == 0) {
+		percent = count / total_size * 100
+		printf "%3d%% [", percent
+		for (i=0;i<=percent;i++)
+			printf "="
+			printf ">"
+			for (i=percent;i<100;i++)
+				printf " "
+				printf "]\r"
+			}
+		}
+	END { print "" }' total_size=$(stat -c '%s' "${1}") count=0
+}
+
+# Show current network information
+netinfo ()
+{
+	echo "--------------- Network Information ---------------"
+	/sbin/ifconfig | awk /'inet addr/ {print $2}'
+	echo ""
+	/sbin/ifconfig | awk /'Bcast/ {print $3}'
+	echo ""
+	/sbin/ifconfig | awk /'inet addr/ {print $4}'
+
+	/sbin/ifconfig | awk /'HWaddr/ {print $4,$5}'
+	echo "---------------------------------------------------"
+}
+
+
+# View Apache logs
+apachelog ()
+{
+	if [ -f /etc/httpd/conf/httpd.conf ]; then
+		cd /var/log/httpd && ls -xAh && multitail --no-repeat -c -s 2 /var/log/httpd/*_log
+	else
+		cd /var/log/apache2 && ls -xAh && multitail --no-repeat -c -s 2 /var/log/apache2/*.log
+	fi
+}
+
+function color_my_prompt {
+    local __user_and_host="\[\033[01;32m\]\u@\h"
+    local __cur_location="\[\033[01;34m\]\w"
+    local __git_branch_color="\[\033[93m\]"
+    local __git_branch='$(__git_ps1 "[%s]")'
+    local __prompt_tail="\[\033[35m\]$"
+    local __last_color="\[\033[00m\]"
+    export PS1="$__cur_location$__git_branch_color$__git_branch$__prompt_tail$__last_color "
+}
+color_my_prompt
+
+
+
+
+
+# :network_devices ----- Print a list of all network devices
+function :network_devices() { for ip in $(seq 1 254); do ping -c 1 10.4.1.$ip>/dev/null; [ $? -eq 0 ] && echo "10.4.1.$ip UP" || : ; done; }
+
+
+# :wanip ----- Print your WAN IP address
+alias :wanip="dig +short myip.opendns.com @resolver1.opendns.com"
+
+# ----- WAN IP address Logger
+function wanip_log() {
+    wanip_val=$(dig +short myip.opendns.com @resolver1.opendns.com)
+    curr_ts=$(date +"%Y-%m-%d %H:%M:%S")
+    echo [$curr_ts] $wanip_val >> /var/log/wan_ip.log
+
+    # previous wan ip is stored in an Env. Variable
+
+    # compare the stored wan ip with the wan ip just received
+
+    # if the two are different, update the Env. Variable, and then somehow notify Adge that a change has taken place - because the AWS security groups with my ip will need to be modified to reflect the new ip
+}
+
+trim-whitespace() {
+	echo "$@" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
 }
 
 
 
-#more ip stuff
-ipif() { 
-    if grep -P "(([1-9]\d{0,2})\.){3}(?2)" <<< "$1"; then
-     curl ipinfo.io/"$1"
-    else
-    ipawk=($(host "$1" | awk '/address/ { print $NF }'))
-    curl ipinfo.io/${ipawk[1]}
-    fi
-    echo
-}
 
 
 
 
 
-
-#good for opening bash info
-# printf "\n"
-# printf "   %s\n" "IP ADDR: $(curl ifconfig.me)"
-# printf "   %s\n" "USER: $(echo $USER)"
-# printf "   %s\n" "DATE: $(date)"
-# printf "   %s\n" "UPTIME: $(uptime -p)"
-# printf "   %s\n" "HOSTNAME: $(hostname -f)"
-# printf "   %s\n" "CPU: $(awk -F: '/model name/{print $2}' | head -1)"
-# printf "   %s\n" "KERNEL: $(uname -rms)"
-# printf "   %s\n" "PACKAGES: $(dpkg --get-selections | wc -l)"
-# printf "   %s\n" "RESOLUTION: $(xrandr | awk '/\*/{printf $1" "}')"
-# printf "   %s\n" "MEMORY: $(free -m -h | awk '/Mem/{print $3"/"$2}')"
-# printf "\n"
 
 
 
