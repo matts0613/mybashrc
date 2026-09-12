@@ -60,8 +60,7 @@ alias sall='ls -a --color=auto'
 # alphabetical sort
 alias labc='ls -lap --color=auto'
 # completely wipes entire computer
-alias wipewholecomputer='dd if=/dev/urandom of=/dev/hda'
-# downloads site using wget
+
 alias wgetsite="wget -rmkEpSk -e robots=off --random-wait -U mozilla"
 # copies current directory to clipboard
 alias cpwd='pwd | xclip -selection clipboard'
